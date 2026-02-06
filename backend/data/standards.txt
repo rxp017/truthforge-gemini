@@ -1,0 +1,14 @@
+[SECTOR: ENGINEERING - ISO-CIVIL-2024]
+Rooftop water storage units exceeding 500 liters must be constructed of UV-resistant High-Density Polyethylene (HDPE) or Grade 316L Stainless Steel. Wood and cardboard are strictly prohibited.
+
+[SECTOR: LEGAL - GDPR-PRIVACY-2018]
+Article 17: Right to Erasure. Data controllers must delete personal data without undue delay if the data is no longer necessary or if the user withdraws consent. Storing deleted user data in "archive" folders accessible to general staff is a violation.
+
+[SECTOR: FINANCE - PCI-DSS-4.0]
+Requirement 3.2: Do not store sensitive authentication data (SAD) after authorization. This includes the full contents of the magnetic stripe, CVV2/CVC2 code, and PIN blocks. Storing CVV codes in a SQL database is strictly forbidden.
+
+[SECTOR: MEDICAL - HIPAA-SEC-2023]
+Technical Safeguards: Protected Health Information (PHI) sent over open networks must be encrypted using AES-256 or TLS 1.3. Sending patient diagnoses via standard unencrypted SMS or email is a violation.
+
+[SECTOR: ACADEMIC - CITATION-STD-1]
+Plagiarism Rule: Any content exceeding 10 words derived from an external source must be cited. AI-generated text must be disclosed as "AI-Assisted" in the methodology section.
