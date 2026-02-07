@@ -35,7 +35,7 @@ export default function Home() {
     setFixedSolution("");
     
     try {
-      const res = await fetch("http://localhost:8000/api/verify", {
+      const res = await fetch("https://rxp017-truthforge-backend.hf.space/api/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ spec, answer, rules }),
@@ -51,7 +51,7 @@ export default function Home() {
   async function generateFix() {
     setFixing(true);
     try {
-      const res = await fetch("http://localhost:8000/api/fix", {
+      const res = await fetch("https://rxp017-truthforge-backend.hf.space/api/fix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ spec, answer, rules }),
