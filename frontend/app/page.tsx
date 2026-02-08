@@ -126,7 +126,18 @@ export default function Home() {
             border: 1px solid ${theme === 'dark' ? 'rgba(197, 160, 89, 0.2)' : 'rgba(197, 160, 89, 0.3)'};
         }
         /* Markdown Code Styles */
-        pre { background: #1e1e1e; padding: 15px; border-radius: 8px; overflow-x: auto; color: #d4d4d4; }
+        /* OLD LINE (DELETE THIS): */
+/* pre { background: #1e1e1e; padding: 15px; border-radius: 8px; overflow-x: auto; color: #d4d4d4; } */
+
+/* NEW LINE (PASTE THIS): */
+pre { 
+    background: ${theme === 'dark' ? '#1e1e1e' : '#f4f4f5'}; 
+    color: ${theme === 'dark' ? '#d4d4d4' : '#1f2937'};
+    padding: 15px; 
+    border-radius: 8px; 
+    overflow-x: auto; 
+    border: 1px solid ${theme === 'dark' ? 'transparent' : '#e5e7eb'};
+}
         code { font-family: monospace; }
       `}</style>
 
