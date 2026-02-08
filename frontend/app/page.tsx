@@ -33,7 +33,7 @@ export default function Home() {
 
   // --- CONFIG ---
   // REPLACE THIS WITH YOUR HUGGING FACE URL IF DIFFERENT
-  const API_URL = "https://rxp017-truthforge-backend.hf.space"; 
+  const API_URL = "https://rxp017-truthforge-live.hf.space";
 
   // --- THEME HANDLER ---
   useEffect(() => {
