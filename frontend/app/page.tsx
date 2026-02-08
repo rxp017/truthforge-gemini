@@ -257,7 +257,7 @@ export default function Home() {
 
                             <div className="text-center p-4 rounded-lg bg-gray-50 dark:bg-[#2a2926] min-w-[140px]">
                                 <div className="text-xs uppercase tracking-widest opacity-60 font-bold">Confidence</div>
-                                <div className="text-4xl font-black my-1">{result.confidence_score}%</div>
+                                <div className="text-4xl font-black my-1 text-gray-900 dark:text-white">{result.confidence_score}%</div>
                             </div>
                         </div>
                     </div>
