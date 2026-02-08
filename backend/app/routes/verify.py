@@ -8,30 +8,22 @@ from vector_store import VectorStore
 
 router = APIRouter()
 
-# --- 1. ABSOLUTE PATH FIX (GPS) ---
-# Get the folder where THIS file (verify.py) lives: backend/app/routes
+# --- PATH SETUP ---
 CURRENT_FILE = Path(__file__).resolve()
-# Go up 2 levels to 'backend'
 BACKEND_DIR = CURRENT_FILE.parent.parent.parent
-# Now point to data/vector_store.json
 DB_PATH = BACKEND_DIR / "data" / "vector_store.json"
 
-print(f"📍 Debug: I am looking for the DB here: {DB_PATH}")
-
 if DB_PATH.exists():
-    print("✅ Database FOUND! RAG System Active.")
     db = VectorStore(storage_file=str(DB_PATH))
 else:
-    print("❌ Database NOT FOUND at that path. RAG Disabled.")
     db = None
-# ---------------------------------
 
 
 @router.post("/verify")
 def verify(req: VerifyRequest):
     print(f"\n📨 Received spec: {req.spec[:30]}...")
 
-    # 2. RAG SEARCH
+    # RAG SEARCH
     retrieved_rules_text = "No official standards found."
     sources_list = []
 
@@ -39,21 +31,17 @@ def verify(req: VerifyRequest):
         print("🔍 Searching database...")
         results = db.search(req.spec, top_k=3)
         if results:
-            # Format for Gemini
             retrieved_rules_text = "\n".join(
                 [f"- {r['text']} [SOURCE: {r['metadata']['source']}]" for r in results])
-            # Format for Frontend (Clean list)
             sources_list = [
                 f"{r['metadata']['source']}: {r['text'][:100]}..." for r in results]
-            print(f"📚 RAG Context:\n{retrieved_rules_text}")
 
-    # 3. THE PROMPT (Universal Version)
+    # VERIFICATION PROMPT
     prompt = f"""
-    You are TruthForge, a Universal Verification & Fact-Checking Engine.
-    Your goal is to verify claims across ANY domain (Law, Engineering, Medical, Finance, etc.).
+    You are TruthForge, a Universal Verification Engine.
     
     === INPUT DATA ===
-    CLAIM / QUERY: {req.spec}
+    QUERY: {req.spec}
     PROPOSED ANSWER: {req.answer}
     USER CONSTRAINTS: {req.rules}
 
@@ -61,32 +49,27 @@ def verify(req: VerifyRequest):
     {retrieved_rules_text}
 
     === INSTRUCTIONS ===
-    1. Identify the domain of the request (e.g., is this Legal? Engineering? Medical?).
-    2. Compare the ANSWER against the KNOWLEDGE BASE and CONSTRAINTS.
-    3. If the answer is hallucinating, factually wrong, or dangerous, the Falsifier must reject it.
-    4. If the answer violates a specific code (GDPR, ISO, HIPAA), the Compliance agent must cite it.
-    5. Assign a CONFIDENCE SCORE (0-100).
+    1. Verify the PROPOSED ANSWER against the QUERY and KNOWLEDGE BASE.
+    2. If the answer is irrelevant, factually wrong, or violates the Knowledge Base, it fails.
+    3. Return JSON ONLY.
 
     === OUTPUT FORMAT (JSON ONLY) ===
     {{
         "agents": [
-            {{ "name": "Falsifier", "status": "danger", "log": "Explanation of risks..." }},
-            {{ "name": "Compliance", "status": "warning/success", "log": "Citing [SOURCE]..." }}
+            {{ "name": "Risk Detector", "status": "danger/success", "log": "Short explanation." }},
+            {{ "name": "Rule Checker", "status": "warning/success", "log": "Short explanation." }}
         ],
         "final_verdict": "PASS or FAIL",
         "confidence_score": 95,
-        "summary": "Brief summary including the detected domain."
+        "summary": "1 sentence summary of why it passed or failed."
     }}
     """
 
-    # 4. Call Gemini
     raw_response = call_gemini(prompt)
 
-    # 5. Parse & Merge RAG Data
     clean_json = raw_response.replace("```json", "").replace("```", "").strip()
     try:
         data = json.loads(clean_json)
-        # Inject the sources so the frontend can see them
         data["rag_sources"] = sources_list
         return data
     except:
@@ -97,7 +80,8 @@ def verify(req: VerifyRequest):
             "summary": raw_response,
             "rag_sources": []
         }
-# ... (keep existing code above)
+
+# --- THE FIXER ENDPOINT (UPDATED) ---
 
 
 class FixRequest(VerifyRequest):
@@ -108,33 +92,33 @@ class FixRequest(VerifyRequest):
 def fix_solution(req: FixRequest):
     print("🔧 Generative Fix Requested...")
 
-    # 1. RAG Search (We need the rules to know HOW to fix it)
     retrieved_rules = ""
     if db:
         results = db.search(req.spec, top_k=2)
         if results:
-            retrieved_rules = "\n".join(
-                [f"- {r['text']} [SOURCE: {r['metadata']['source']}]" for r in results])
+            retrieved_rules = "\n".join([f"- {r['text']}" for r in results])
 
-    # 2. The Prompt
+    # --- UPDATED PROMPT: DIRECT ANSWER ONLY ---
     prompt = f"""
-    You are a Senior Compliance Engineer. The user's proposed solution FAILED verification.
-    Your job is to rewrite the solution so it becomes COMPLIANT.
+    The user's previous AI answer was INCORRECT or UNSAFE.
+    Your job is to generate the CORRECT answer for the User's Query.
 
     === CONTEXT ===
-    QUERY: {req.spec}
-    FAILED ANSWER: {req.answer}
+    USER QUERY: {req.spec}
+    BAD ANSWER: {req.answer}
     OFFICIAL RULES: {retrieved_rules}
 
-    === INSTRUCTIONS ===
-    1. Write a new, corrected solution that satisfies the QUERY and the OFFICIAL RULES.
-    2. Explicitly mention which standard you are adhering to.
-    3. Keep it professional and direct.
+    === STRICT INSTRUCTIONS ===
+    1. Write the correct answer to the USER QUERY.
+    2. Ensure the answer complies with the OFFICIAL RULES naturally.
+    3. DO NOT include a "Compliance" section.
+    4. DO NOT include "Methodology" or "Sources".
+    5. DO NOT explain what you fixed. Just give the clean, final result.
+    6. If the answer is code, provide ONLY the code.
 
-    === OUTPUT FORMAT ===
-    Return only the corrected text. Do not use JSON.
+    === OUTPUT ===
+    Return ONLY the corrected text/code. No intro, no outro.
     """
 
-    # 3. Call Gemini
     fixed_text = call_gemini(prompt)
     return {"fixed_solution": fixed_text}
