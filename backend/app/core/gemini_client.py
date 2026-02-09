@@ -11,7 +11,7 @@ if not API_KEY:
 
 client = genai.Client(api_key=API_KEY)
 
-MODEL_NAME = "gemini-3-flash-preview"
+model_name = "models/gemini-2.5-flash"
 
 
 def call_gemini(prompt: str) -> str:
