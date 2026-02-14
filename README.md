@@ -1,13 +1,3 @@
-**Instructions:**
-
-1. Go to your GitHub repository.
-2. Click on the `README.md` file.
-3. Click the **Pencil Icon** (Edit).
-4. **Delete everything** currently there.
-5. **Copy and Paste** the code block below.
-6. Click **"Commit changes"**.
-
----
 
 ```markdown
 # 🛡️ TruthForge: Universal AI Compliance Firewall
@@ -149,13 +139,7 @@ def send_data(patient_id, data):
 3. **Remediation Agent:** **Rewrites the code** to use `https://` and adds error handling.
 4. **Result:** You get a verified, secure code snippet.
 
----
 
-## 🔮 What's Next
-
-* **IDE Extension:** Bring TruthForge verification directly into VS Code.
-* **Custom Policies:** Allow companies to upload their own internal PDF rulebooks.
-* **CI/CD Integration:** verify code compliance automatically in GitHub Actions.
 
 ---
 
